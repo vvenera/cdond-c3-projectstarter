@@ -324,17 +324,18 @@ jobs:
               apk upgrade
               apk add curl
               apk add --no-cache --upgrade bash 
-      - run:
-          name: Get backend url
-          command: |
-              export temp=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].PublicIpAddress' --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}) 
-              export temp="${temp%\"}"
-              export BACKEND_IP="${temp#\"}"
-              echo "${BACKEND_IP}"
+      # - run:
+      #     name: Get backend url
+      #     command: |
+      #         export temp=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].PublicIpAddress' --filters Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}) 
+      #         export temp="${temp%\"}"
+      #         export BACKEND_IP="${temp#\"}"
+      #         echo "${BACKEND_IP}"
 
       - run:
           name: Backend smoke test.
           command: |
+              export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].PublicIpAddress' --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --region us-east-1 --output text)
               export API_URL="http://${BACKEND_IP}:3030"
               echo "${API_URL}"
               if curl "${API_URL}/api/status" | grep "ok"
@@ -355,6 +356,8 @@ jobs:
               else
                 return 1
               fi
+        - destroy-environment
+        - revert-migrations
       # Here's where you will add some code to rollback on failure  
 
   # cloudfront-update:
