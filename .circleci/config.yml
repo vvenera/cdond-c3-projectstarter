@@ -223,7 +223,7 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request PUT --data "1" https://api.memstash.io/values/udapeople_${CIRCLE_WORKFLOW_ID:0:7}
             fi
       - destroy-environment
-      - revert-migrations
+      # - revert-migrations
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
@@ -262,7 +262,7 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - destroy-environme
-      - revert-migrations    
+      # - revert-migrations    
                     
   deploy-backend:
     docker:
@@ -293,8 +293,7 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - revert-migrations
-      - destroy-environment 
+      - destroy-environment
       # Here's where you will add some code to rollback on failure  
 
   # smoke-test:
