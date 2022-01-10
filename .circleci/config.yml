@@ -234,8 +234,7 @@ jobs:
       - run:
           name: Install tar gzip
           command: |
-            yum -y install tar
-            yum -y install gzip
+            apk add --update zip tar
       - run:
           name: Install awscli
           command: |
@@ -243,7 +242,7 @@ jobs:
       - run:
           name: Install npm
           command: |
-            yum -y install npm
+            apk add --update nodejs npm ansible
       - run:
           name: Get backend url
           command: |
@@ -276,9 +275,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum -y install tar
-            yum -y install gzip
-            apk add --update nodejs npm ansible
+            apk add --update nodejs npm ansible zip tar
             pip install awscli
       - run:
           name: Deploy backend
