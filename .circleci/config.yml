@@ -142,7 +142,6 @@ jobs:
           name: SSH or Git CLI client                 
           command: |            
               yum install -y openssh-client git
-      
       - checkout
       # - git-shallow-clone/checkout
       - run:
@@ -186,6 +185,10 @@ jobs:
     docker:
       - image: python:3.7-alpine3.11
     steps:
+      - run:          
+          name: SSH or Git CLI client          
+          command: |            
+              apk add --update openssh-client git
       - checkout
       - add_ssh_keys:
           fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
