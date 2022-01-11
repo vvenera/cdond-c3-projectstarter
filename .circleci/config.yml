@@ -192,7 +192,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["4b:ce:81:59:97:1f:58:69:d9:65:81:f4:b7:c3:bd:b8"]
+          fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
       - attach_workspace:
           at: /tmp/ansible
       - run:
@@ -299,7 +299,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["4b:ce:81:59:97:1f:58:69:d9:65:81:f4:b7:c3:bd:b8"]
+          fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
       - attach_workspace:
           at: ~/
       - run:
@@ -329,7 +329,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["4b:ce:81:59:97:1f:58:69:d9:65:81:f4:b7:c3:bd:b8"]
+          fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
       - attach_workspace:
           at: ~/
       - run:
@@ -380,7 +380,7 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      # Checkout code from git
+      - checkout
       - run:
           name: Install dependencies
           command: |
