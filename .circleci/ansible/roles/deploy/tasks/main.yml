@@ -1,30 +1,54 @@
+---
+- name: "install dependencies."
+  become: true
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+    update_cache: yes
+
+- name: "install pm2"
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
 - name: create backend directory
-  become: yes
   file:
-    path: ~/backend
+    path: /home/ubuntu/backend
     state: directory
-    mode: 0755
 
-- name: copy backend files
-  become: yes
-  copy:
-    src: ~/project/artifact.tar.gz
-    dest: ~/backend/artifact.tar.gz
+- name: copy backend dist files
+  ansible.builtin.unarchive:
+    src: artifact.tar.gz
+    dest: /home/ubuntu/backend
 
-- name: unpack backend files
-  become: yes
+- name: unpack backend
   shell: |
-    cd ~/backend
-    tar -vxf artifact.tar.gz
-    rm -f artifact.tar.gz
-
-- name: start app 
-  become: yes
+    cd /home/ubuntu/
+    tar xvzf artifact.tar.gz -C .
+    ls -la
+    
+- name: install node 
   shell: |
-    cd ~/backend
-    npm i
-    pm2 start main.js --update-env
-    # pm2 stop default
-    # pm2 start npm -- start
-    # cd dist
-    # pm2 start main.js --update-env
+    cd /home/ubuntu/backend
+    npm install
+    npm install --only=dev
+- name: Build package
+  shell: |
+    cd /home/ubuntu/backend
+    npm run build
+    cat .env
+    npm run prestart:prod
+- name: start backend app
+  shell: |
+    cd /home/ubuntu/backend 
+    pm2 stop default
+    pm2 start npm --name backend -- start
+
+- name: start main.js
+  become: no
+  shell: pm2 start main.js
+  args:
+    chdir: /home/ubuntu/backend/dist

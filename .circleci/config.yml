@@ -310,35 +310,63 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: python:3.7-alpine3.11
     steps:
       - run:          
           name: SSH or Git CLI client          
           command: |            
-              sudo apt-get install openssh-client git
+              apk add --update openssh-client git
       - checkout
-      - add_ssh_keys:
+      - add_ssh_keys: 
           fingerprints: [04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb]
       - attach_workspace:
-          at: ~/
+            at: ~/
       - run:
           name: Install dependencies
           command: |
-            sudo apt update
-            sudo apt upgrade -y
-            sudo apt install -y ansible
-            sudo apt install -y awscli
+            apk update
+            apk upgrade
+            apk add unzip 
+            apk add curl
+            /usr/local/bin/python -m pip install --upgrade pip    
       - run:
-         name: Deploy backend
-         command: |
+          name: Install node
+          command: |
+            apk add --update nodejs nodejs-npm
+            node --version
+            npm --version
+      - run:
+          name: Install ansible
+          command: |
+            # your code here              
+            apk add --update ansible 
+            ansible --version
+      - run:
+          name: Install aws
+          command: |
+            pip install awscli --upgrade   
+            aws --version       
+      - run:
+          name: Deploy backend
+          command: |
+            echo "cd backend -------"
             cd backend
+            echo "npm install -------"
             npm i
             npm run build
-            cp package* ./dist
-            cd dist
-            tar -czvf ../app.tar.gz ./*
-            cd ~/project/.circleci/ansible
-            ansible-playbook deploy-backend.yml --inventory-file=inventory.txt
+            cd ..
+            # Zip the directory
+            echo "zip the directory -------"
+            tar -C backend -czvf artifact.tar.gz .
+            echo "mv artifac to ansibble -------"
+            mv artifact.tar.gz .circleci/ansible/
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+          environment:
+            ANSIBLE_HOST_KEY_CHECKING: false
+
       # - destroy-environment:
       #     WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
       # - revert-migrations:
