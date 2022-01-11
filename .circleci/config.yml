@@ -142,18 +142,15 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
           name: Install Dependencies
           command: |
-            apk add openssh-client
-            pip install awscli
-            cat .circleci/ansible/inventory.txt
-            ls ~/project/.circleci/ansible/
-            cat ~/project/.circleci/ansible/inventory.txt
-            apk add --update nodejs npm tar gzip jq
+            yum install -y tar gzip
+            yum install -y git
+
       - run:
           name: Ensure back-end infrastructure exists
           command: |
