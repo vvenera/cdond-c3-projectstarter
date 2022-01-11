@@ -18,17 +18,13 @@
     tar -vxf artifact.tar.gz
     rm -f artifact.tar.gz
 
-- name: 'wait 60 seconds for target connection to become reachable/usable.'
-  wait_for_connection:
-    timeout: 60
-
 - name: start app 
   become: yes
   shell: |
     cd ~/backend
-    npm install
-    npm run build
-    pm2 stop default
-    pm2 start npm -- start
-    cd dist
+    npm i
     pm2 start main.js --update-env
+    # pm2 stop default
+    # pm2 start npm -- start
+    # cd dist
+    # pm2 start main.js --update-env
