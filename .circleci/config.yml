@@ -257,13 +257,16 @@ jobs:
             #   curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request PUT --data "1" https://api.memstash.io/values/udapeople_${CIRCLE_WORKFLOW_ID:0:7}
             # fi
       - destroy-environment
-      # - revert-migrations
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
     docker:
       - image: python:3.7-alpine3.11
     steps:
+      - run:          
+          name: SSH or Git CLI client          
+          command: |            
+              apk add --update openssh-client git
       - checkout
       - run:
           name: Install tar gzip
@@ -295,12 +298,16 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - destroy-environment
-      # - revert-migrations    
+      - revert-migrations    
                     
   deploy-backend:
     docker:
         - image: python:3.7-alpine3.11
     steps:
+      - run:          
+          name: SSH or Git CLI client          
+          command: |            
+              apk add --update openssh-client git
       - checkout
       - add_ssh_keys:
           fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
@@ -325,12 +332,17 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
+      - revert-migrations
       # Here's where you will add some code to rollback on failure  
 
   smoke-test:
     docker:
       - image: python:3.7-alpine3.11
     steps:
+      - run:          
+          name: SSH or Git CLI client          
+          command: |            
+              apk add --update openssh-client git
       - checkout
       - add_ssh_keys:
           fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
@@ -384,6 +396,10 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
+      - run:          
+          name: SSH or Git CLI client          
+          command: |            
+              yum install -y openssh-client git
       - checkout
       - run:
           name: Install dependencies
@@ -404,8 +420,12 @@ jobs:
 
   cleanup:
       docker:
-      - image: amazon/aws-cli
+        - image: amazon/aws-cli
       steps:
+        - run:          
+            name: SSH or Git CLI client          
+            command: |            
+              yum install -y openssh-client git
         - checkout
         - run:
             name: Get old stack workflow id
