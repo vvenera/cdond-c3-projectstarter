@@ -138,7 +138,7 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - checkout
+      # - checkout
       # - git-shallow-clone/checkout
       - run:
           name: Install Dependencies
