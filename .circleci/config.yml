@@ -141,8 +141,9 @@ jobs:
       #- checkout
       # - git-shallow-clone/checkout
       - run:
-          yum install -y git
-          git clone --depth 1 "https://github.com/vvenera/cdond-c3-projectstarter.git" --branch "test-feature-branch"
+          command: |
+            yum install -y git
+            git clone --depth 1 "https://github.com/vvenera/cdond-c3-projectstarter.git" --branch "test-feature-branch"
       - run:
           name: Install Dependencies
           command: |
