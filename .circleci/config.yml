@@ -12,6 +12,7 @@ commands:
           when: on_fail
           command: |
             echo "Destroying environment: ${CIRCLE_WORKFLOW_ID:0:7}"
+            aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -219,11 +220,11 @@ jobs:
       - run:
           name: install dependendies 
           command: |
-            sudo apt-get install python3-pip
-            pip3 install awscli     
+            sudo apt update
+            sudo apt upgrade -y
+            sudo apt install -y awscli    
       - run:
           name: Run migrations
-          working_directory: ./backend
           command: |
             echo ENVIRONMENT=$ENVIRONMENT > ".env"
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ".env"
@@ -236,7 +237,7 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             cat .env          
-            # cd backend
+            cd backend
             npm install
             npm run migrations > migrations_dump.txt
       - save_cache:
@@ -256,7 +257,8 @@ jobs:
             # then
             #   curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request PUT --data "1" https://api.memstash.io/values/udapeople_${CIRCLE_WORKFLOW_ID:0:7}
             # fi
-      - destroy-environment
+      - destroy-environment:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
      # Here's where you will add some code to rollback on failure      
 
   deploy-frontend:
@@ -297,42 +299,49 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
-      - destroy-environment
-      - revert-migrations    
+      - destroy-environment:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}  
                     
   deploy-backend:
     docker:
-        - image: python:3.7-alpine3.11
+      - image: circleci/node:13.8.0
     steps:
       - run:          
           name: SSH or Git CLI client          
           command: |            
-              apk add --update openssh-client git
+              sudo apt-get install openssh-client git
       - checkout
       - add_ssh_keys:
-          fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
+          fingerprints: [04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb]
       - attach_workspace:
           at: ~/
       - run:
           name: Install dependencies
           command: |
-            apk add --update nodejs npm ansible gzip tar
-            pip install awscli
+            sudo apt update
+            sudo apt upgrade -y
+            sudo apt install -y ansible
+            sudo apt install -y awscli
       - run:
-          name: Deploy backend
-          command: |
-            cd backend
-            npm i
-            npm run build
-            cd ..
-            # Zip the directory
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment
-      - revert-migrations
+         name: Deploy backend
+         command: |
+           cd backend
+           npm i
+           npm run build
+           cp package* ./dist
+           cd ..
+           # Zip the directory
+           tar -C backend -czvf artifact.tar.gz .
+           cd .circleci/ansible
+           echo "Contents  of the inventory.txt file is -------"
+           cat inventory.txt
+           ansible-playbook -i inventory.txt deploy-backend.yml    
+      - destroy-environment:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
       # Here's where you will add some code to rollback on failure  
 
   smoke-test:
@@ -345,7 +354,7 @@ jobs:
               apk add --update openssh-client git
       - checkout
       - add_ssh_keys:
-          fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
+          fingerprints: [04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb]
       - attach_workspace:
           at: ~/
       - run:
@@ -389,8 +398,10 @@ jobs:
               else
                 return 1
               fi
-      - destroy-environment
-      - revert-migrations
+      - destroy-environment:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          WorkflowID: ${CIRCLE_WORKFLOW_ID:0:7}
 
   cloudfront-update:
     docker:
