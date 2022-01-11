@@ -140,7 +140,6 @@ jobs:
           paths: [backend/node_modules]
           key: backend-audit
 
-
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
@@ -374,7 +373,7 @@ jobs:
               fi
       - destroy-environment
       - revert-migrations
-      
+
   cloudfront-update:
     docker:
       - image: amazon/aws-cli
