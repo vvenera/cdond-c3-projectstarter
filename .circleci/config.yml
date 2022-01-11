@@ -139,7 +139,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       #- checkout
-      - git-shallow-clone/checkout:
+      - git-shallow-clone/checkout
       - run:
           name: Install Dependencies
           command: |
