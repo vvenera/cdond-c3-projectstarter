@@ -321,8 +321,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: [04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb]
-      - attach_workspace:
-            at: ~/
+      # - attach_workspace:
+      #       at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -346,7 +346,7 @@ jobs:
       - run:
           name: Install aws
           command: |
-            pip install awscli --upgrade
+            pip install awscli
             aws --version
       - run:
           name: Deploy backend
