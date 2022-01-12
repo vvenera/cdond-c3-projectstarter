@@ -144,7 +144,7 @@ jobs:
       - run:
           name: SSH or Git CLI client
           command: |
-              yum install -y openssh-client git
+            yum install -y openssh-client git
       - checkout
       # - git-shallow-clone/checkout
       - add_ssh_keys:
@@ -193,10 +193,7 @@ jobs:
       - run:
           name: SSH or Git CLI client
           command: |
-              apk add --update openssh-client git
-
-      - attach_workspace:
-          at: ~/
+            apk add --update openssh-client git
       - checkout
       - add_ssh_keys:
           fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
@@ -204,8 +201,10 @@ jobs:
           name: Install Dependecies
           command: |
             apk add --update ansible
-            pip install awscli
+            pip install awscli --upgrade
             aws --version
+      - attach_workspace:
+          at: ~/
       - run:
           name: Configure server
           command: |
