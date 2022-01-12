@@ -29,8 +29,8 @@
     cd /home/ubuntu/
     tar xvzf artifact.tar.gz -C .
     ls -la
-    
-- name: install node 
+
+- name: install node
   shell: |
     cd /home/ubuntu/backend
     npm install
@@ -43,7 +43,7 @@
     npm run prestart:prod
 - name: start backend app
   shell: |
-    cd /home/ubuntu/backend 
+    cd /home/ubuntu/backend
     pm2 stop default
     pm2 start npm --name backend -- start
 
