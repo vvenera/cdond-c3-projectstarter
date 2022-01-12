@@ -139,7 +139,7 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli
     steps:
       - run:
           name: SSH or Git CLI client
@@ -147,12 +147,12 @@ jobs:
               yum install -y openssh-client git
       - checkout
       # - git-shallow-clone/checkout
+      - add_ssh_keys:
+          fingerprints: ["04:27:9a:45:9d:0f:b0:39:d7:47:96:41:6b:81:10:bb"]
       - run:
           name: Install Dependencies
           command: |
             yum install -y tar gzip
-            pip install awscli
-
       - run:
           name: Ensure back-end infrastructure exists
           command: |
