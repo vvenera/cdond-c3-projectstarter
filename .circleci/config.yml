@@ -233,7 +233,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            echo ENVIRONMENT=production >> "backend/.env"
+            #echo ENVIRONMENT=production >> "backend/.env"
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> "backend/.env"
             echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
             echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> "backend/.env"
@@ -297,8 +297,8 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            echo ENVIRONMENT=production > frontend/.env
-            echo NODE_ENV=production > frontend/.env
+            echo NODE_ENV=production >> frontend/.env
+            echo ENVIRONMENT=production >> frontend/.env
             cat frontend/.env
       - run:
           name: Deploy frontend objects
@@ -337,13 +337,13 @@ jobs:
       - run:
           name: Install node
           command: |
-            apk add --update nodejs nodejs-npm
+            apk add --update npm
+            apk add --update nodejs
             node --version
             npm --version
       - run:
           name: Install ansible
           command: |
-            # your code here
             apk add --update ansible
             ansible --version
       - run:
@@ -354,16 +354,25 @@ jobs:
       - run:
           name: Deploy backend
           command: |
+            echo NODE_ENV=production >> ~/project/backend/.env
+            echo "TYPEORM_CONNECTION = ${TYPEORM_CONNECTION}" >> ~/project/backend/.env
+            echo "TYPEORM_ENTITIES = ${TYPEORM_ENTITIES}" >> ~/project/backend/.env
+            echo "TYPEORM_HOST = ${TYPEORM_HOST}" >> ~/project/backend/.env
+            echo "TYPEORM_PORT = ${TYPEORM_PORT}" >> ~/project/backend/.env
+            echo "TYPEORM_USERNAME = ${TYPEORM_USERNAME}" >> ~/project/backend/.env
+            echo "TYPEORM_PASSWORD = ${TYPEORM_PASSWORD}" >> ~/project/backend/.env
+            echo "TYPEORM_DATABASE = ${TYPEORM_DATABASE}" >> ~/project/backend/.env
+            echo "TYPEORM_MIGRATIONS = ${TYPEORM_MIGRATIONS}" >> ~/project/backend/.env
+            echo "TYPEORM_MIGRATIONS_DIR = ${TYPEORM_MIGRATIONS_DIR}" >> ~/project/backend/.env
             cd backend
             npm i
             npm run build
             cd ..
-            # Zip the directory
             tar -C backend -czvf artifact.tar.gz .
-            echo "****** mv artifac to ansible ******"
-            mv artifact.tar.gz .circleci/ansible/
+            mkdir -p ./.circleci/ansible/roles/deploy/files
+            cp -r artifact.tar.gz ./.circleci/ansible/roles/deploy/files/
             cd .circleci/ansible
-            echo "****** inventory.txt contents ******"
+            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i inventory.txt deploy-backend.yml
@@ -477,11 +486,13 @@ jobs:
         - run:
             name: Remove old stacks and files
             command: |
-              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" && ! -z $OldWorkflowID]]
               then
                 aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
                 aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                 aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+              else
+                echo "No stacks found with old workflow"
               fi
 workflows:
   default:
