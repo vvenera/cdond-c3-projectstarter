@@ -250,10 +250,8 @@ jobs:
             echo "TYPEORM_MIGRATIONS_DIR = ${TYPEORM_MIGRATIONS_DIR}" >> ~/project/backend/.env
             cd ~/project/backend
             source ~/.profile
-            nvm install v14.18.1
+            nvm install v13.8.0
             echo "Check node versions_______________"
-            node --version
-            npm --version
             npm install
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
