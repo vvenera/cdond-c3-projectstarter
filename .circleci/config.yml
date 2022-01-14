@@ -230,10 +230,11 @@ jobs:
       - restore_cache:
           keys:
             - backend-build
-      # - run:
-      #     name: Install nvm
-      #     command: |
-      #       curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+      - run:
+          name: Install nvm
+          command: |
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+            source ~/.profile
       - run:
           name: Run migrations
           command: |
@@ -248,12 +249,11 @@ jobs:
             echo "TYPEORM_MIGRATIONS = ${TYPEORM_MIGRATIONS}" >> ~/project/backend/.env
             echo "TYPEORM_MIGRATIONS_DIR = ${TYPEORM_MIGRATIONS_DIR}" >> ~/project/backend/.env
             cd ~/project/backend
-            # source ~/.profile
+            nvm install v14.18.1
             echo "Check node versions_______________"
-            node -v
-            npm -v
+            node --version
+            npm --version
             npm install
-            npm audit fix
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
       - run:
