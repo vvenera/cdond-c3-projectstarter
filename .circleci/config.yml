@@ -227,7 +227,7 @@ jobs:
   run-migrations:
     docker:
       #- image: cimg/node:16.13.1
-      - image: circleci/node:13.8.0
+      - image: circleci/node:14.18.1
     steps:
       - checkout
       - restore_cache:
@@ -256,9 +256,9 @@ jobs:
             node -v
             npm -v
             npm install
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
+            npm audit fix
             npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
       - run:
           # memstash site is currenlty down
           name: Send migration results
