@@ -35,7 +35,7 @@ commands:
               echo "Reverting migration..."
               cd ~/project/backend
               npm install
-              npm run migration:revert
+              npm run migrations:revert
             else
               echo "no success message - migration not reverted"
             fi
@@ -251,7 +251,6 @@ jobs:
             cd ~/project/backend
             source ~/.profile
             nvm install v13.8.0
-            echo "Check node versions_______________"
             npm install
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
